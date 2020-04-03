@@ -1,0 +1,30 @@
+server {
+        listen 80;
+
+	# Disable bad referrers
+        if ($bad_referer) {
+		return 444;
+        }
+
+        include snippets/restrictions.conf;
+
+        error_log  /var/log/nginx/{{ portal.hostname }}-error.log warn;
+        access_log  /var/log/nginx/{{ portal.hostname }}-access.log  main buffer=4096 flush=1m;
+
+        root /var/www/{{ portal.hostname }};
+        index index.php index.html index.htm;
+
+        server_name {{ portal.hostname }};
+
+        location / {
+                try_files $uri $uri/ =404;
+        }
+
+        # pass PHP scripts to FastCGI server
+        #
+        location ~ \.php$ {
+                include snippets/fastcgi-php.conf;
+                fastcgi_pass unix:/var/run/php/php{{ php.version }}-fpm.sock;
+        }
+
+}

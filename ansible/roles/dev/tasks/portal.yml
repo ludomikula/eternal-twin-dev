@@ -1,0 +1,46 @@
+---
+- name: "Create virtual host configuration for {{ portal.hostname }}"
+  template:
+    src: nginx_site.conf.j2
+    dest: "/etc/nginx/sites-available/{{ portal.hostname }}.conf"
+
+- name: "Enable {{ portal.hostname }} virtual host"
+  file:
+    src: "/etc/nginx/sites-available/{{ portal.hostname }}.conf"
+    dest: "/etc/nginx/sites-enabled/{{ portal.hostname }}.conf"
+    state: link
+
+- name: "Add nginx snippets to the configuration."
+  copy:
+    src: '{{ item.src }}'
+    dest: '/etc/nginx/{{ item.dest }}'
+  with_items:
+    - { src: 'nginx/snippets/restrictions.conf', dest: 'snippets/restrictions.conf' }
+    - { src: 'nginx/conf.d/log.conf', dest: 'conf.d/log.conf' }
+
+- name: "Update referral spam config for nginx"
+  get_url:
+    url: "https://raw.githubusercontent.com/Stevie-Ray/referrer-spam-blocker/master/referral-spam.conf"
+    dest: "/etc/nginx/conf.d/referral-spam.conf"
+    force: yes
+
+- name: "Create document root for web"
+  file:
+    path: "/var/www/{{ portal.hostname }}"
+    state: directory
+    owner: "{{ nginx.user }}"
+    group: "{{ nginx.group }}"
+    mode: '0755'
+
+- name: Create dummy index.php into docroot
+  shell: |
+     echo '<?php phpinfo(); ?>' > /var/www/{{ portal.hostname }}/index.php
+     chown {{ nginx.user }}:{{ nginx.group }} /var/www/{{ portal.hostname }}/index.php
+  args:
+    creates: "/var/www/{{ portal.hostname }}/index.php"
+
+
+- name: "Restart nginx to apply changes"
+  service:
+    name: nginx
+    state: restarted

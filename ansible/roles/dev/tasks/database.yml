@@ -1,0 +1,59 @@
+---
+- name: Add the postgresql Apt signing key
+  apt_key:
+    url: https://www.postgresql.org/media/keys/ACCC4CF8.asc
+    state: present
+
+- name: Add postgresql ubuntu repository
+  apt_repository:
+    repo: deb http://apt.postgresql.org/pub/repos/apt/ bionic-pgdg main
+    state: present
+
+- name: Install postgresql-12 if it's not already installed
+  apt:
+    name:
+      - postgresql-12
+      - postgresql-client-12
+    state: present
+
+- name: Allow postgresql connection an all interfaces
+  lineinfile:
+    path: /etc/postgresql/12/main/postgresql.conf
+    regexp: '^listen_addresses = '
+    insertafter: '^#listen_addresses = '
+    line: listen_addresses = '*'
+
+- name: Allow postgresql connection from selected IPs
+  lineinfile:
+    path: /etc/postgresql/12/main/pg_hba.conf
+    regexp: '^host    all             all             127.0.0.1/32            md5'
+    line: "host    all             all             0.0.0.0/32            md5"
+
+- name: Make sure postrgesql is started and enabled on boot
+  service:
+    name: postgresql
+    state: restarted
+    enabled: true
+
+- name: "Create database: {{ postgres.database }}"
+  become: yes
+  become_user: postgres
+  postgresql_db:
+    login_unix_socket: /var/run/postgresql
+    name: "{{ postgres.database }}"
+    encoding: UTF-8
+    lc_collate: en_US.UTF-8
+    lc_ctype: en_US.UTF-8
+    template: template0
+
+- name: "Create database user: {{ postgres.username }} and set privileges"
+  become: yes
+  become_user: postgres
+  postgresql_user:
+    db: "{{ postgres.database }}"
+    priv: ALL
+    name: "{{ postgres.username }}"
+    password: "{{ postgres.password }}" 
+    expires: infinity
+
+

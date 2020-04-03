@@ -1,0 +1,4 @@
+# eternal-twin local development environment
+[eternaltwin]
+localhost ansible_connection=local
+

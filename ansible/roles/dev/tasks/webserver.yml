@@ -1,0 +1,61 @@
+---
+- name: "Add Ondrfej's PHP apt repository if not present"
+  apt_repository:
+    repo: 'ppa:ondrej/php'
+    state: present
+    update_cache: yes
+
+- name: "Install php-fpm if not installed yet"
+  apt:
+    name:
+      - "php{{ php.version }}-fpm"
+      - "php{{ php.version }}-pgsql"
+    state: present
+
+- name: Setup php-fpm config
+  template:
+    src: php-fpm.conf.j2
+    dest: "/etc/php/{{ php.version }}/fpm/php-fpm.conf"
+    force: no
+
+- name: Setup php-fpm pool config
+  template:
+    src: portal-pool.conf.j2
+    dest: "/etc/php/{{ php.version }}/fpm/pool.d/portal-pool.conf"
+    force: no
+
+- name: Remove default php www pool
+  file:
+    path: "/etc/php/{{ php.version }}/fpm/pool.d/www.conf"
+    state: absent
+
+- name: "Ensure php-fpm is started and enabled to start at boot"
+  service:
+    name: "php{{ php.version }}-fpm"
+    state: restarted
+    enabled: yes
+
+- name: "Install nginx if it's not already installed"
+  apt:
+    name:
+      - nginx
+    state: present
+
+- name: "Disable default web site"
+  file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+
+- name: "Set nginx user to {{ nginx.user }}"
+  lineinfile:
+    path: /etc/nginx/nginx.conf
+    regexp: '^user www-data;'
+    line: "user {{ nginx.user }};"
+
+- name: "Ensure nginx is started and enabled to start at boot"
+  service:
+    name: nginx
+    state: started
+    enabled: yes
+
+

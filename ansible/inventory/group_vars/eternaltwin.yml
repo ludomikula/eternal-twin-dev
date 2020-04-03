@@ -1,0 +1,12 @@
+php:
+  version: 7.4
+
+nginx:
+  user: vagrant
+  group: vagrant
+
+postgres:
+  database: portal
+  username: eternaltwin
+  password: secret123
+

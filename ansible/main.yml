@@ -1,0 +1,6 @@
+---
+- hosts: eternaltwin
+  roles:
+    - common
+    - dev
+

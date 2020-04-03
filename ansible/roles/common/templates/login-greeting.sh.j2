@@ -1,0 +1,46 @@
+#!/bin/bash
+
+
+echo "
+                    ====================================
+                    eternal-twin development environment
+                    ====================================
+
+Installation details:
+
+OS:
+  distribution: `lsb_release -d -s`
+        kernel: `uname -a`
+
+Software:
+         nginx: `nginx -v 2>&1| cut -b 16-`
+           PHP: `php -v | head -n 1`
+        nodejs: `nodejs -v`
+           npm: `npm -v`
+          yarn: `yarn --version`
+    postgresql: `psql --version`
+
+
+Portal is available at: http://192.168.111.234/
+
+If you add this entry to your hosts file:
+   - on windows:   C:\Windows\System32\drivers\etc\hosts
+   - on linux/mac: /etc/hosts
+
+   {{ portal.ip }}   {{ portal.hostname }}
+
+On mac you might need to flush your DNS cache:
+   sudo killall -HUP mDNSResponder
+
+
+You can then visit portal at: http://{{ portal.hostname}}/
+
+Web root directory: /var/www/{{ portal.hostname }}/
+PostgreSQL:
+   - database: {{ postgres.database }}
+   -     user: {{ postgres.username }}
+   - password: {{ postgres.password }}
+   -     host: {{ portal.ip}}:5432
+  
+"
+

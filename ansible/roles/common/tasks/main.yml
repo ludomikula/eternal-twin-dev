@@ -1,0 +1,33 @@
+---
+# file: common/tasks/main.yml
+
+- name: Update system packages cache
+  apt:
+    cache_valid_time: 3600
+
+- name: Install required common system packages
+  apt:
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - wget
+      - software-properties-common
+      - unzip
+      - zip
+      - python-psycopg2
+    state: latest
+
+- name: Set /bin/sh to bash instead of dash
+  alternatives:
+    name: sh
+    link: /bin/sh
+    path: /bin/bash
+
+- name: Copy .bash_login to HOME directory
+  template:
+    src: login-greeting.sh.j2
+    dest: /etc/profile.d/Z999-login-greeting.sh
+    mode: 0755
+    force: no
+

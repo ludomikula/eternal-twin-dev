@@ -1,0 +1,15 @@
+---
+- name: Install and prepopulate database
+  import_tasks: database.yml
+
+- name: Install nginx and configure nginx
+  import_tasks: webserver.yml
+
+- name: Install PHP and NodeJS
+  import_tasks: appserver.yml
+
+- name: "Create {{ portal.hostname }} nginx configuration"
+  import_tasks: portal.yml
+
+- name: Clone code from gitlab
+  import_tasks: sources.yml

@@ -1,0 +1,23 @@
+---
+- name: Install Node.js 12
+  shell: |
+    curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash - && sudo apt-get install -y nodejs
+  args:
+    creates: /usr/bin/nodejs
+
+- name: Add the yarn Apt signing key
+  apt_key:
+    url: https://dl.yarnpkg.com/debian/pubkey.gpg
+    state: present
+
+- name: Add yarn ubuntu repository
+  apt_repository:
+    repo: deb https://dl.yarnpkg.com/debian/ stable main
+    state: present
+
+- name: Install yarn if it's not already installed
+  apt:
+    name:
+      - yarn
+    state: present
+
