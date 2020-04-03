@@ -1,0 +1,25 @@
+---
+- name: "Create directory for holding etwin sources: {{ portal.sourcedir }}"
+  file:
+    path: "{{ portal.sourcedir }}"
+    state: directory
+    recurse: yes
+    owner: "{{ nginx.user }}"
+    group: "{{ nginx.group }}"
+
+- name: Clone etwin repository
+  become: yes
+  become_user: "{{ nginx.user }}"
+  git:
+    repo: 'https://gitlab.com/eternal-twin/etwin'
+    dest: "{{ portal.sourcedir }}"
+    version: master
+
+- name: Build etwin sources (might take some time)
+  become: yes
+  become_user: "{{ nginx.user }}"
+  command: yarn install
+  args:
+    chdir:  "{{ portal.sourcedir }}"
+
+

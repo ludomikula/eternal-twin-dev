@@ -1,6 +1,9 @@
 php:
   version: 7.4
 
+nodejs:
+  version: 13
+
 nginx:
   user: vagrant
   group: vagrant

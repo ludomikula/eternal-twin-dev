@@ -1,7 +1,12 @@
 ---
-- name: "Create virtual host configuration for {{ portal.hostname }}"
+- name: "Create example virtual host configuration with php-fpm"
   template:
     src: nginx_site.conf.j2
+    dest: "/etc/nginx/sites-available/{{ portal.hostname }}.conf.php-example"
+
+- name: "Create virtual host configuration for {{ portal.hostname }}"
+  template:
+    src: nginx_portal.conf.j2
     dest: "/etc/nginx/sites-available/{{ portal.hostname }}.conf"
 
 - name: "Enable {{ portal.hostname }} virtual host"
