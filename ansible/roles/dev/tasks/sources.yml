@@ -22,4 +22,18 @@
   args:
     chdir:  "{{ portal.sourcedir }}"
 
+- name: Create .env config file
+  template:
+    src: etwin.env.j2
+    dest: "{{ portal.sourcedir }}/.env"
+    force: no
+    owner: "{{ nginx.user }}"
+    group: "{{ nginx.group }}"    
+
+- name: Create etwin database schema
+  become: yes
+  become_user: "{{ nginx.user }}"
+  command: yarn --cwd packages/etwin-pg start create
+  args:
+    chdir: "{{ portal.sourcedir }}"
 

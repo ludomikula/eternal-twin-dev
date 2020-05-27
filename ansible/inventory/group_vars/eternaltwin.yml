@@ -2,14 +2,14 @@ php:
   version: 7.4
 
 nodejs:
-  version: 13
+  version: 14
 
 nginx:
   user: vagrant
   group: vagrant
 
 postgres:
-  database: portal
-  username: eternaltwin
-  password: secret123
+  database: etwindb
+  username: etwin
+  password: dev
 
